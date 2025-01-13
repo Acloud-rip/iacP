@@ -57,11 +57,11 @@ jobs:
       - name: Set Pulumi Access Token
         run: echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
-      # Select the Pulumi stack
-      - name: Select Pulumi stack
+      # Initialize the Pulumi Stack (if not exists)
+      - name: Initialize Pulumi Stack
         run: |
           source venv/bin/activate
-          pulumi stack select iacP/prueba01/dev1
+          pulumi stack select dev1 || pulumi stack init dev1
 
       # Deploy the Pulumi program with --yes to bypass confirmation
       - name: Deploy with Pulumi
@@ -70,4 +70,5 @@ jobs:
           pulumi up --yes --non-interactive
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}  # Ensure the token is passed here
+
 
