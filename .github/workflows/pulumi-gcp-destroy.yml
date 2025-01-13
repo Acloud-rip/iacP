@@ -1,4 +1,4 @@
-name: Pulumi CI/CD
+name: Destroy
 
 on:
   workflow_dispatch:
@@ -38,7 +38,9 @@ jobs:
         run: |
           source venv/bin/activate
           pulumi version
-
+      - name: Print actor (user who pushed)
+        run: echo "The user who triggered this workflow is: ${{ github.actor }}"
+ 
       # Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
