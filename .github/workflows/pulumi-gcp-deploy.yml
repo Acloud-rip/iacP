@@ -53,6 +53,12 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      # Select the Pulumi stack
+      - name: Select Pulumi stack
+        run: |
+          source venv/bin/activate
+          pulumi stack select iacP/prueba01/dev1
+
       # Deploy the Pulumi program with --yes to bypass confirmation
       - name: Deploy with Pulumi
         run: |
