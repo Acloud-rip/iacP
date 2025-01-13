@@ -30,11 +30,12 @@ jobs:
       - name: Install Pulumi CLI
         run: |
           curl -fsSL https://get.pulumi.com | sh
-          export PATH=$HOME/.pulumi/bin:$PATH
-          
-      # Add Pulumi to PATH
-      - name: Add Pulumi to PATH
-        run: echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+          # Add Pulumi to the current PATH for the next steps
+          echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+
+      # Verify Pulumi installation (check if it's working)
+      - name: Check Pulumi version
+        run: pulumi version
 
       # Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
