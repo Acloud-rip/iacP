@@ -53,12 +53,11 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # Deploy the Pulumi program
+      # Deploy the Pulumi program with --yes to bypass confirmation
       - name: Deploy with Pulumi
         run: |
           source venv/bin/activate
-          pulumi up --non-interactive
+          pulumi up --yes --non-interactive
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
 
