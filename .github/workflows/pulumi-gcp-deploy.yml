@@ -53,6 +53,10 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      # Set the PULUMI_ACCESS_TOKEN before running Pulumi commands
+      - name: Set Pulumi Access Token
+        run: echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
       # Select the Pulumi stack
       - name: Select Pulumi stack
         run: |
@@ -66,5 +70,4 @@ jobs:
           pulumi up --yes --non-interactive
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}  # Ensure the token is passed here
-
 
