@@ -19,7 +19,7 @@ jobs:
         python-version: '3.x'
 
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v3.0.1
+      uses: pulumi/action-install-pulumi-cli@v3
       with:
         pulumi-version: 3.x  # Asegúrate de usar la versión adecuada
 
