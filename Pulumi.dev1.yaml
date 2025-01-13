@@ -1,0 +1,4 @@
+config:
+  gcp:project: rip-gti-desa
+  gcp:region: southamerica-west1
+  gcp:zone: southamerica-west1-a
