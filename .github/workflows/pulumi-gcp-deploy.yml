@@ -26,6 +26,16 @@ jobs:
           # Install additional dependencies if needed
           # pip install -r requirements.txt  # Uncomment if you have a requirements file
 
+      # Install Pulumi CLI
+      - name: Install Pulumi CLI
+        run: |
+          curl -fsSL https://get.pulumi.com | sh
+          export PATH=$HOME/.pulumi/bin:$PATH
+          
+      # Add Pulumi to PATH
+      - name: Add Pulumi to PATH
+        run: echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+
       # Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
@@ -43,7 +53,8 @@ jobs:
         uses: pulumi/actions@v3
         with:
           command: up
-          stack-name: LuisRiosAcloud/pulumi-project/dev
-          work-dir: pulumi-project
+          stack-name: iacP/prueba01/dev1
+          work-dir: prueba01
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
