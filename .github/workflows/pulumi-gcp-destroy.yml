@@ -1,0 +1,71 @@
+name: Pulumi CI/CD
+
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # Checkout the code
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Adjust to your Python version
+
+      # Create a virtual environment and install dependencies
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install pulumi
+          pip install pulumi_gcp  # Instalar pulumi_gcp
+          # Instalar cualquier otra dependencia adicional si es necesario
+          # pip install -r requirements.txt  # Si tienes un archivo requirements.txt
+
+      # Install Pulumi CLI
+      - name: Install Pulumi CLI
+        run: |
+          curl -fsSL https://get.pulumi.com | sh
+          # Add Pulumi to the current PATH for the next steps
+          echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+
+      # Verify Pulumi installation (check if it's working)
+      - name: Check Pulumi version
+        run: |
+          source venv/bin/activate
+          pulumi version
+
+      # Authenticate with Google Cloud
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      # Set up the Cloud SDK with the project ID
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # Set the PULUMI_ACCESS_TOKEN before running Pulumi commands
+      - name: Set Pulumi Access Token
+        run: echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
+      # Initialize the Pulumi Stack (if not exists)
+      - name: Initialize Pulumi Stack
+        run: |
+          source venv/bin/activate
+          pulumi stack select dev1 || pulumi stack init dev1
+
+      # Deploy the Pulumi program with --yes to bypass confirmation
+      - name: Deploy with Pulumi
+        run: |
+          source venv/bin/activate
+          pulumi destroy --yes --non-interactive
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}  # Ensure the token is passed here
+
