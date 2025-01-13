@@ -1,5 +1,6 @@
 import pulumi
 from pulumi_gcp import compute
+import pulumi_gcp as gcp
 
 # Crear una red VPC
 vpc = compute.Network("my-vpc", auto_create_subnetworks=False)
@@ -33,6 +34,22 @@ instance = compute.Instance("my-instance",
         "subnetwork": subnet.id,
         "accessConfigs": [{}],  # Esto asigna una IP pública
     }])
+
+default = gcp.cloudrun.Service("default",
+    name="cloudrun-srv",
+    location="southamerica-west1",
+    template={
+        "spec": {
+            "containers": [{
+                "image": "us-docker.pkg.dev/cloudrun/container/hello",
+            }],
+        },
+    },
+    traffics=[{
+        "percent": 100,
+        "latest_revision": True,
+    }])
+
 
 # Exportar información útil
 pulumi.export("instance_name", instance.name)
