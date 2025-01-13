@@ -18,9 +18,11 @@ jobs:
         with:
           python-version: '3.9'  # Adjust to your Python version
 
-      # Install Python and Pulumi dependencies
-      - name: Install dependencies
+      # Create a virtual environment and install dependencies
+      - name: Create virtual environment
         run: |
+          python -m venv venv
+          source venv/bin/activate
           python -m pip install --upgrade pip
           pip install pulumi
           # Install additional dependencies if needed
@@ -35,7 +37,9 @@ jobs:
 
       # Verify Pulumi installation (check if it's working)
       - name: Check Pulumi version
-        run: pulumi version
+        run: |
+          source venv/bin/activate
+          pulumi version
 
       # Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
@@ -51,11 +55,10 @@ jobs:
 
       # Deploy the Pulumi program
       - name: Deploy with Pulumi
-        uses: pulumi/actions@v3
-        with:
-          command: up
-          stack-name: iacP/prueba01/dev1
-          work-dir: prueba01
+        run: |
+          source venv/bin/activate
+          pulumi up --non-interactive
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
 
