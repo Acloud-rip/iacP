@@ -1,48 +1,49 @@
-name: Deploy Pulumi to GCP
+name: Pulumi CI/CD
 
 on:
   push:
     branches:
-      - main  # Ejecutar cuando haya un push en la rama 'main'
+      - main
 
 jobs:
   deploy:
+    name: Deploy Infrastructure
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4  # Checkout the code
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Adjust to your Python version
 
-    - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v3
-      with:
-        pulumi-version: 3.x  # Asegúrate de usar la versión adecuada
+      # Install Python and Pulumi dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pulumi
+          # Install additional dependencies if needed
+          # pip install -r requirements.txt  # Uncomment if you have a requirements file
 
-    - name: Install project dependencies
-      run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
+      # Authenticate with Google Cloud
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    - name: Configure GCP credentials
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-      run: |
-        echo "$GOOGLE_CREDENTIALS" > gcp-key.json
-        gcloud auth activate-service-account --key-file=gcp-key.json
-        gcloud config set project rip-gti-desa
+      # Set up the Cloud SDK with the project ID
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-    - name: Pulumi preview
-      env:
-        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      run: pulumi preview
-
-    - name: Pulumi up
-      env:
-        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      run: pulumi up --yes
+      # Deploy the Pulumi program
+      - name: Deploy with Pulumi
+        uses: pulumi/actions@v3
+        with:
+          command: up
+          stack-name: LuisRiosAcloud/pulumi-project/dev
+          work-dir: pulumi-project
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
