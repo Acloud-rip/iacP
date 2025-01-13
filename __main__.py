@@ -35,20 +35,17 @@ instance = compute.Instance("my-instance",
         "accessConfigs": [{}],  # Esto asigna una IP pública
     }])
 
-default = gcp.cloudrun.Service("default",
-    name="cloudrun-srv",
-    location="southamerica-west1",
-    template={
-        "spec": {
-            "containers": [{
-                "image": "us-docker.pkg.dev/cloudrun/container/hello",
-            }],
-        },
-    },
-    traffics=[{
-        "percent": 100,
-        "latest_revision": True,
-    }])
+cluster = gcp.container.Cluster("gke-cluster",
+    initial_node_count=1,
+    deletion_protection=False,  # Desactiva la protección contra eliminación
+    node_config=gcp.container.ClusterNodeConfigArgs(
+        machine_type="e2-medium",  # Especifica el tipo de máquina
+        oauth_scopes=[
+            "https://www.googleapis.com/auth/cloud-platform",
+        ],
+    ),
+    location="southamerica-west1-a",  # Región deseada
+)
 
 
 # Exportar información útil
